@@ -204,6 +204,8 @@ func calculateResponseLength(adu []byte) int {
 		length += 6
 	case FuncCodeReadFIFOQueue:
 		// undetermined
+	case FuncCodeReadDeviceId:
+		length += 3
 	default:
 	}
 	return length

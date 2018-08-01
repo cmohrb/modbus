@@ -432,6 +432,36 @@ func (mb *client) ReadFIFOQueue(address uint16) (results []byte, err error) {
 	return
 }
 
+func (mb *client) ReadDeviceId(deviceid byte, objectid byte) (results []byte, err error) {
+	request := ProtocolDataUnit{
+	FunctionCode: FuncCodeReadDeviceId,
+	Data:         []byte{MEITypeDeviceId, deviceid, objectid},
+	}
+	response, err := mb.send(&request)
+	if err != nil {
+		return
+	}
+	if len(response.Data) < 7 {
+		err = fmt.Errorf("modbus: response data size '%v' is less than minimum '%v'", len(response.Data), 7)
+		return
+	}
+	results = response.Data[2:]
+	return
+}
+
+func (mb *client) UserFunction(usersubfunc byte, data []byte) (results []byte, err error) {
+	request := ProtocolDataUnit{
+	FunctionCode: FuncCodeUser,
+	Data:         append([]byte{usersubfunc}, data...),
+	}
+	response, err := mb.send(&request)
+	if err != nil {
+		return
+	}
+	results = response.Data[4:]
+	return
+}
+
 // Helpers
 
 // send sends request and checks possible exception in the response.
